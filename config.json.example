@@ -1,0 +1,42 @@
+{
+    "prefix": "!",
+    "token": "Bot Token Here",
+    "commandsDir": "./commands/",
+    "includesDir": "./includes/",
+    "logsDir": "./logs/",
+    "configFile": "./config.json",
+    "currencyFile": "./currency.json",
+    "walletFile": "./walletData.json",
+    "embedColors": {
+        "general": "0x33CCFF",
+        "light": "0x0099CC",
+        "error": "0x4F545C",
+        "win": "0x00FF00",
+        "loss": "0xFF0000"
+    },
+    "userCurrencyConfig": {
+        "useDatabase": false,
+        "databaseConnInfo": {
+            "host": "",
+            "database": "",
+            "port": 0,
+            "user": "",
+            "password": ""
+        }
+    },
+    "guildRestriction": {
+        "restrict": false,
+        "allowedGuilds": []
+    },
+    "cacheDataInVariable": true,
+    "seedChannelId": "625113536460226561",
+    "newSeedSeconds": 3600,
+    "pastebinConfig": {
+        "allowPastes": true,
+        "submitWithoutKey": true,
+        "devApiKey": ""
+    },
+    "processCommandsSynchronously": true,
+    "storeServerSeeds": true,
+    "findCardEmojisByName": true
+}
