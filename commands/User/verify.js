@@ -42,6 +42,10 @@ module.exports = {
             }
         }
         let result = await message.client.dbClient.query('SELECT (server_seed, last_nonce) FROM seeds WHERE server_seed_id = $1;', [serverSeedId]);
+        if(!result || (result.rows && result.rows.length < 1)){
+            embed.addField("Error retrieving seed", `There was a problem retreving the specified seed. Please verify manually.`);
+            return message.channel.send(embed).catch(console.error);
+        }
         result = result.rows[0].row.substring(1, result.rows[0].row.length-1).split(",");
         const serverSeed = result[0];
         const lastNonce = result[1];
