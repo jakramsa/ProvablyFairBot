@@ -51,14 +51,14 @@ class CurrencyHandler {
     }
 
     async validBet(currency){
-        const parsedBet = await this.parseCurrency(currency);
-        if(isNaN(parsedBet)){ return this.BetValidityEnum.INVALID_AMOUNT; }
-        if(!isFinite(parsedBet)){ return this.BetValidityEnum.INVALID_MULTIPLIER; }
         const validCurrency = await this.validCurrency(currency);
         if(validCurrency){
+            const parsedBet = await this.parseCurrency(currency);
+            if(isNaN(parsedBet)){ return this.BetValidityEnum.INVALID_AMOUNT; }
+            if(!isFinite(parsedBet)){ return this.BetValidityEnum.INVALID_MULTIPLIER; }
             const minimum = await this.getMinimumBet(currency);
-            const maximum = await this.getMaximumBet(currency);
             if(parsedBet < minimum){ return this.BetValidityEnum.AMOUNT_TOO_LOW; }
+            const maximum = await this.getMaximumBet(currency);
             if(parsedBet > maximum){ return this.BetValidityEnum.AMOUNT_TOO_HIGH; }
             const wallets = await this.getWallets(currency.guildId);
             if(!wallets){ return this.BetValidityEnum.ERROR; }
