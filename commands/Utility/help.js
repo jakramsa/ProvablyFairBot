@@ -30,7 +30,7 @@ module.exports = {
                 let cmds = Array.from(commands.values());
                 embed.setFooter(`Page ${parseInt(args[0])}/${Math.ceil(commands.size/this.displayLimit)}`);
                 for(let i=(parseInt(args[0])-1)*this.displayLimit; i<cmds.length && embed.fields.length < this.displayLimit;i++){
-                    embed.addField(cmds[i].name, cmds[i].description);
+                    embed.addField(prefix+cmds[i].name, cmds[i].description);
                 }
                 return message.channel.send(embed).catch(console.error);
             } else {
@@ -44,7 +44,7 @@ module.exports = {
             embed.setFooter(`Page 1/${Math.ceil(commands.size/this.displayLimit)}`);
             for(let command in cmds){
                 if(embed.fields.length < this.displayLimit){
-                    embed.addField(cmds[command].name, cmds[command].description);
+                    embed.addField(prefix+cmds[command].name, cmds[command].description);
                 }
             }
             return message.channel.send(embed).catch(console.error);
