@@ -38,5 +38,6 @@
     },
     "processCommandsSynchronously": true,
     "storeServerSeeds": true,
-    "findCardEmojisByName": true
+    "findCardEmojisByName": true,
+    "supportServerLink": "https://discord.gg/543Zj5N"
 }
