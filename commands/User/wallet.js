@@ -41,8 +41,10 @@ module.exports = {
             let currencyAmount = (0).toFixed(currencyInfo[currencyName].maxDecimals);
             if(currencyName in wallets[userId].currencies && Math.abs(wallets[userId].currencies[currencyName].balance) > 0){
                 //currencyAmount = parseFloat(Math.round(wallets[userId].currencies[currencyName].balance * Math.pow(10,currencyInfo[currencyName].maxDecimals)) / Math.pow(10,currencyInfo[currencyName].maxDecimals)).toFixed(currencyInfo[currencyName].maxDecimals);
-                currencyAmount = wallets[userId].currencies[currencyName].balance.toPrecision(Math.ceil(Math.abs(wallets[userId].currencies[currencyName].balance/10))+currencyInfo[currencyName].maxDecimals);
-                
+                let precision = Math.ceil(Math.abs(wallets[userId].currencies[currencyName].balance/10))+currencyInfo[currencyName].maxDecimals;
+                if(precision < 1){ precision = 1; }
+                else if(precision > 100){ precision = 100; }
+                currencyAmount = wallets[userId].currencies[currencyName].balance.toPrecision(precision);
             }
             walletEmbed.addField(`${currencyName} Balance`, `${currencyInfo[currencyName].prefix}${parseFloat(currencyAmount).toFixed(currencyInfo[currencyName].maxDecimals)}${currencyInfo[currencyName].postfix}`);
         }
