@@ -36,9 +36,9 @@ module.exports = {
             return message.channel.send(embed).catch(console.error);
         }
         const newMultiplierName = args[1];
-        if(args[1].length > 1){
+        if(args[1].length > 1 || !(/[A-Za-z]/.test(args[1]))){
             embed.setColor(embedColors.error)
-            .addField("Error", `'${args[1]}' is not a valid multiplier. Multipliers must be a single character and are not case sensitive.`);
+            .addField("Error", `'${args[1]}' is not a valid multiplier. Multipliers must be a single alphabetical character and are not case sensitive.`);
             return message.channel.send(embed).catch(console.error);
         }
         const result  = await currencyHandler.addMultiplier(currency, newMultiplierName, newMultiplierAmount).catch(console.error);
