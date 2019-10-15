@@ -417,6 +417,11 @@ class CurrencyHandler {
         }
         return this.saveCurrencyInfo(currency.guildId, currencyInfo);
     }
+
+    async getGuildCurrencyCount(currency){
+        let currencyInfo = await this.getCurrencyInfo(currency.guildId);
+        return Object.keys(currencyInfo).length;
+    }
 }
 
 module.exports = CurrencyHandler;
