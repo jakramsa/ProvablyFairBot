@@ -60,9 +60,9 @@ class ProvablyFairBot extends Discord.Client {
             if(!this.fs.existsSync(this.logFile)){
                 this.fs.writeFile(this.logFile, "", { flag: 'w' }, function (error) {
                     if(error) {
-                        console.log("Log file creation was unsuccessful.", error);
+                        console.log("Log file "+bot.logFile+" creation was unsuccessful.", error);
                     } else {
-                        console.log("Log file creation was successful.");
+                        console.log("Log "+bot.logFile+" file creation was successful.");
                     }
                 });
             }
@@ -163,7 +163,15 @@ class ProvablyFairBot extends Discord.Client {
                     command.execute(message, args);
                 } catch (error) {
                     this.log.call(null, error);
-                    message.channel.send('Command Error: Check Logs.').catch(console.error);
+                    message.channel.send(`Command Error: Please report this error on the support server. ${this.config.supportServerLink}`).catch(console.error);
+                    if(this.config.errorChannelId && this.config.errorChannelId !== "" && this.channels.get(this.config.errorChannelId)){
+                        let embed = new this.discord.RichEmbed()
+                            .setColor(this.config.embedColors.error)
+                            .setTitle(message.author.username)
+                            .addField("Message Content", message.content)
+                            .addField("Error", error);
+                        this.channels.get(this.config.errorChannelId).send(embed).catch(console.error);
+                    }
                 }
             }
         });
@@ -195,12 +203,12 @@ class ProvablyFairBot extends Discord.Client {
             }
             if(this.config.storeServerSeeds){
                 if(this.serverSeed){
-                    await this.dbClient.query('INSERT INTO seeds(server_seed, server_seed_hash, last_nonce) VALUES($1, $2, $3);', [this.serverSeed, this.crypto.createHash('sha256').update(this.serverSeed).digest('hex'), this.nonce-1]);
+                    await this.dbClient.query('INSERT INTO seeds(server_seed_id, server_seed, server_seed_hash, last_nonce) VALUES($1, $2, $3, $4);', [this.serverSeedId, this.serverSeed, this.crypto.createHash('sha256').update(this.serverSeed).digest('hex'), this.nonce-1]);
                 }
                 let result = await this.dbClient.query('SELECT count(*) FROM seeds;');
                 if(!result || !result.rows || result.rows.length < 0){
                     this.serverSeedId = 0;
-                    this.log.call(null, "An error occurred trying to returning the seed count.");
+                    this.log.call(null, "An error occurred trying to return the seed count.");
                 } else {
                     this.serverSeedId = parseInt(result.rows[0].count)+1;
                 }

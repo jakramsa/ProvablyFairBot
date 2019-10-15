@@ -30,6 +30,7 @@
     },
     "cacheDataInVariable": true,
     "seedChannelId": "625113536460226561",
+    "errorChannelId": "633755434611638307",
     "newSeedSeconds": 3600,
     "pastebinConfig": {
         "allowPastes": true,
