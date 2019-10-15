@@ -9,6 +9,8 @@ module.exports = {
     usage(){ return `${prefix}${this.name} [currency] [number of decimals]`; },
     cooldown: 0,
     guildOnly: true,
+    decimalLowerLimit: 0,
+    decimalUpperLimit: 8,
     async execute(message, args) {
         const currencyHandler = message.client.currencyHandler;
         const member = message.guild.member(message.author);
@@ -33,6 +35,11 @@ module.exports = {
         if(isNaN(numberOfDecimals)){
             embed.setColor(embedColors.error)
             .addField("Error", `'${args[1]}' is not a valid number of decimals.`);
+            return message.channel.send(embed).catch(console.error);
+        }
+        if(numberOfDecimals < this.decimalLowerLimit || numberOfDecimals > this.decimalUpperLimit){
+            embed.setColor(embedColors.error)
+            .addField("Error", `The maximum number of decimals is limited to range [${this.decimalLowerLimit}, ${this.decimalUpperLimit}].`);
             return message.channel.send(embed).catch(console.error);
         }
         let result = await currencyHandler.setDecimals(currency, numberOfDecimals).catch(console.error);
