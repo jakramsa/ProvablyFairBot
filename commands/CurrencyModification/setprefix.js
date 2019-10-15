@@ -8,6 +8,7 @@ module.exports = {
     usage(){ return `${prefix}${this.name} [currency] "[prefix]"`; },
     cooldown: 0,
     guildOnly: true,
+    maximumPrefixLength: 10,
     async execute(message, args) {
         const currencyHandler = message.client.currencyHandler;
         const member = message.guild.member(message.author);
@@ -38,6 +39,11 @@ module.exports = {
             }
         } else {
             newPrefix = message.content.split(/ +/)[2];
+        }
+        if(newPrefix.length > this.maximumPrefixLength){
+            embed.setColor(embedColors.error)
+            .addField("Error", `The maximum allowable prefix length is ${this.maximumPrefixLength}.`);
+            return message.channel.send(embed).catch(console.error);
         }
         let result = await currencyHandler.setPrefix(currency, newPrefix).catch(console.error);
         if(result){

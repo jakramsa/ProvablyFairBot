@@ -8,6 +8,7 @@ module.exports = {
     usage(){ return `${prefix}${this.name} [currency] "[postfix]"`; },
     cooldown: 0,
     guildOnly: true,
+    maximumPostfixLength: 10,
     async execute(message, args) {
         const currencyHandler = message.client.currencyHandler;
         const member = message.guild.member(message.author);
@@ -38,6 +39,11 @@ module.exports = {
             }
         } else {
             newPostfix = message.content.split(/ +/)[2];
+        }
+        if(newPostfix.length > this.maximumPostfixLength){
+            embed.setColor(embedColors.error)
+            .addField("Error", `The maximum allowable postfix length is ${this.maximumPostfixLength}.`);
+            return message.channel.send(embed).catch(console.error);
         }
         let result = await currencyHandler.setPostfix(currency, newPostfix).catch(console.error);
         if(result){
