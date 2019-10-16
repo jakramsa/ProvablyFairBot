@@ -278,8 +278,15 @@ class ProvablyFairBot extends Discord.Client {
             const result = await commandInfo.command.execute(commandInfo.message, commandInfo.args);
         } catch(error) {
             this.log.call(null, error);
-            commandInfo.message.channel.send('Command Error: Check Logs.').catch(console.error);
-            
+            message.channel.send(`Command Error: Please report this error on the support server. ${this.config.supportServerLink}`).catch(console.error);
+            if(this.config.errorChannelId && this.config.errorChannelId !== "" && this.channels.get(this.config.errorChannelId)){
+                let embed = new this.discord.RichEmbed()
+                    .setColor(this.config.embedColors.error)
+                    .setTitle(message.author.username)
+                    .addField("Message Content", message.content)
+                    .addField("Error", error);
+                this.channels.get(this.config.errorChannelId).send(embed).catch(console.error);
+            }
         }
         if(this.commandQueue.length >= 1 && !this.pauseProcessingCommands){ this.processCommand(); } else { this.processingCommand = false; }
         return;
