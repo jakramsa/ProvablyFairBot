@@ -77,28 +77,6 @@ class CurrencyHandler {
     async parseCurrency(currency, floor = false){
         let currencyInfo = await this.getCurrencyInfo(currency.guildId);
         const amountType = typeof(currency.amount);
-        /*if(amountType !== "string"){
-            return parseFloat(
-                parseFloat(
-                    (floor?
-                    Math.floor(currency.amount*Math.pow(10,currencyInfo[currency.name].maxDecimals)):
-                    Math.round(currency.amount*Math.pow(10,currencyInfo[currency.name].maxDecimals)))
-                    / Math.pow(10,currencyInfo[currency.name].maxDecimals)
-                ).toFixed(currencyInfo[currency.name].maxDecimals)
-            );
-        }
-        let multiplier = 1;
-        let letterCount = currency.amount.match(/[a-zA-Z]/g);
-        if(letterCount){
-            if(letterCount.length > 1 || (letterCount.length == 1 && currencyInfo[currency.name].currencyMultipliers[letterCount[0]] == null)){
-                return Infinity;
-            } else {
-                multiplier = currencyInfo[currency.name].currencyMultipliers[letterCount[0]];
-            }
-        }
-        currency.amount = multiplier*parseFloat(letterCount?currency.amount.replace(letterCount[0], ""):currency.amount);
-        const parsedBet = parseFloat(parseFloat(Math.round(currency.amount*Math.pow(10,currencyInfo[currency.name].maxDecimals)) / Math.pow(10,currencyInfo[currency.name].maxDecimals)).toFixed(currencyInfo[currency.name].maxDecimals));
-        return parsedBet;*/
         if(amountType === "string"){
             let multiplier = 1;
             let letterCount = currency.amount.match(/[a-zA-Z]/g);
@@ -135,7 +113,7 @@ class CurrencyHandler {
     async addBalance(userId, currency){
         const wallets = await this.getWallets(currency.guildId);
         if(!wallets){ return false; }
-        const parsedAmount = await this.parseCurrency(currency, true);
+        const parsedAmount = await this.parseCurrency(currency, currency.amount > 0);
         if(isNaN(parsedAmount) || !isFinite(parsedAmount)){ return false; }
         if(!(userId in wallets)){ wallets[userId] = {"currencies": {}, "private": false, "seed": ""}; }
         if(!(currency.name in wallets[userId].currencies)){
@@ -146,8 +124,9 @@ class CurrencyHandler {
     }
 
     async deductBalance(userId, currency){
-        const amount = await this.parseCurrency(currency, true);
-        const result = await this.addBalance(userId, this.Currency(currency.guildId, currency.name, -1*amount));
+        let amount = await this.parseCurrency(currency);
+        if(amount > 0){ amount = -1*amount; }
+        const result = await this.addBalance(userId, this.Currency(currency.guildId, currency.name, amount));
         return result;
     }
 
