@@ -10,6 +10,7 @@ module.exports = {
     usage(){ return `${prefix}${this.name} [currency] [amount[multiplier]]`; },
     cooldown: 0,
     guildOnly: true,
+    responseTime: 60000,
     gameTitle: 'Video Poker (Jack or Better)',
     pairMultiplier: 2,
     twoPairMultiplier: 3,
@@ -80,7 +81,7 @@ module.exports = {
                     pokerGame.handRolls.push(rollValue);
                 }
                 resultsEmbed.addField("Player Hand",`${this.rollsToString(pokerGame.handRolls, pokerGame.removedRolls)}`, true)
-                    .addField("Select Holds",`Choose which cards you want to hold, within the next 60 seconds. Enter the card numbers to hold separated by commas. Example: 1,2,5 will hold the first, second, and fifth card while discarding the rest.\n\n**All cards will be held if no valid response is received.** `, true)
+                    .addField("Select Holds",`Choose which cards you want to hold, within the next ${ this.responseTime/1000 } seconds. Enter the card numbers to hold separated by commas. Example: 1,2,5 will hold the first, second, and fifth card while discarding the rest.\n\n**All cards will be held if no valid response is received.** `, true)
                     .setFooter((pokerGame.serverSeeds?`Server Seed(s): ${pokerGame.serverSeeds.join(", ")} `:"")+"Client Seed: '"+pokerGame.seed+"' Nonce: "+pokerGame.nonces.join(", "));
                 message.channel.send(resultsEmbed).then(async (m) => {
                     pokerGame.gameMessage = m;
@@ -92,7 +93,7 @@ module.exports = {
                                    return (!isNaN(potentialInt) && potentialInt >= 1 && potentialInt <= 5)
                                }).length > 1);
                     }, {
-                        max: 1, time: 60000, errors: ['time']
+                        max: 1, time: this.responseTime, errors: ['time']
                     }).then(async (collected) => {
                         let holdArray = collected.first().content.toLowerCase().split(",").filter(e => { const potentialInt = parseInt(e); return (!isNaN(potentialInt) && potentialInt >= 1 && potentialInt <= 5) }).map((string) => { return parseInt(string); });
                         let removeArray = new Array(5);
