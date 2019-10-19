@@ -88,13 +88,7 @@ module.exports = {
                 message.channel.send(resultsEmbed).then(async (m) => {
                     pokerGame.gameMessage = m;
                     message.channel.awaitMessages((nm) => {
-                        return nm.author.id === message.author.id &&
-                               (/^\d$/.test(nm.content) ||
-                               nm.content.toLowerCase().split(",").filter(e => {
-                                   const potentialInt = parseInt(e);
-                                   return (!isNaN(potentialInt) && potentialInt >= 1 && potentialInt <= 5)
-                               }).length > 1 ||
-                               nm.content === 'hold');
+                        return this.validPositionsMessage(message, nm);
                     }, {
                         max: 1, time: this.responseTime, errors: ['time']
                     }).then(async (collected) => {
@@ -340,6 +334,15 @@ module.exports = {
             }
         }, this);
         return handValue;
+    },
+    validPositionsMessage(userMessage, testMessage){
+        return testMessage.author.id === userMessage.author.id &&
+               (/^\d$/.test(testMessage.content) ||
+               testMessage.content.toLowerCase().split(",").filter(e => {
+                   const potentialInt = parseInt(e);
+                   return (!isNaN(potentialInt) && potentialInt >= 1 && potentialInt <= 5)
+               }).length > 1 ||
+               testMessage.content === 'hold');
     },
     async showResults(pokerGame){
         const message = pokerGame.message;
