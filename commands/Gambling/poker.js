@@ -66,7 +66,7 @@ module.exports = {
                 if (clientSeed === ""){
                     clientSeed = message.client.defaultClientSeed;
                 }
-                pokerGame = { "message": message, "bet": bet, "seed": clientSeed, "handRolls": [], "removedRolls": [], "nonces":[] };
+                pokerGame = { "message": message, "bet": bet, "seed": clientSeed, "handRolls": [], "removedRolls": [], "nonces":[], "over": false };
                 message.client.poker.set(message.author.id, pokerGame);
                 if(storeServerSeeds){ pokerGame.serverSeeds = []; pokerGame.serverSeeds.push(message.client.serverSeedId); }
                 const wagerString = await currencyHandler.getCurrencyString(bet);
@@ -92,6 +92,8 @@ module.exports = {
                     }, {
                         max: 1, time: this.responseTime, errors: ['time']
                     }).then(async (collected) => {
+                        if(pokerGame.over === true){ return; }
+                        pokerGame.over = true;
                         if(collected.first().content.toLowerCase() === 'hold'){ return this.showResults(pokerGame); }
                         let holdArray = collected.first().content.toLowerCase().split(",").filter(e => { const potentialInt = parseInt(e); return (!isNaN(potentialInt) && potentialInt >= 1 && potentialInt <= 5) }).map((string) => { return parseInt(string); });
                         let removeArray = new Array(5);
@@ -116,6 +118,8 @@ module.exports = {
                         pokerGame.removedRolls = removeArray;
                         this.showResults(pokerGame);
                     }).catch((collected) => {
+                        if(pokerGame.over === true){ return; }
+                        pokerGame.over = true;
                         message.reply(`you did not respond in time with a valid hold. Holding all cards in hand.`);
                         this.showResults(pokerGame);
                     });
@@ -125,6 +129,8 @@ module.exports = {
                     await m.react(this.acceptEmoji).catch(console.error);
                     m.awaitReactions((reaction, user) => { return reaction.emoji.name === this.acceptEmoji && user.id === message.author.id}, { maxEmojis: 1, time: this.responseTime, errors: ['time'] }
                     ).then(async (collected) => {
+                        if(pokerGame.over === true){ return; }
+                        pokerGame.over = true;
                         let holdArray = [];
                         for(let i = 0; i < this.positionEmojis.length; i++){
                            let reacted = m.reactions.find((reaction) => reaction.emoji.name === this.positionEmojis[i] && reaction.users.has(message.author.id));
