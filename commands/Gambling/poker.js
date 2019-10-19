@@ -45,6 +45,8 @@ module.exports = {
         8: 'Straight Flush',
         9: 'Royal Flush'
     },
+    positionEmojis: ["\u0031\u20E3", "\u0032\u20E3", "\u0033\u20E3", "\u0034\u20E3","\u0035\u20E3"],
+    acceptEmoji: "\uD83D\uDC4C",
     async execute(message, args) {
         const currencyHandler = message.client.currencyHandler;
         const member = message.guild.member(message.author);
@@ -123,6 +125,10 @@ module.exports = {
                         message.reply(`you did not respond in time with a valid hold. Holding all cards in hand.`);
                         this.showResults(pokerGame);
                     });
+                    for(let i = 0; i < this.positionEmojis.length; i++){
+                        await m.react(this.positionEmojis[i]).catch(console.error);
+                    }
+                    await m.react(this.acceptEmoji).catch(console.error);
                     return;
                 }).catch(console.error);
                 return;
