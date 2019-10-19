@@ -66,7 +66,7 @@ module.exports = {
                 if (clientSeed === ""){
                     clientSeed = message.client.defaultClientSeed;
                 }
-                pokerGame = { "message": message, "bet": bet, "seed": clientSeed, "handRolls": [], "removedRolls": [], "nonces":[], "over": false };
+                let pokerGame = { "message": message, "bet": bet, "seed": clientSeed, "handRolls": [], "removedRolls": [], "nonces":[], "over": false };
                 message.client.poker.set(message.author.id, pokerGame);
                 if(storeServerSeeds){ pokerGame.serverSeeds = []; pokerGame.serverSeeds.push(message.client.serverSeedId); }
                 const wagerString = await currencyHandler.getCurrencyString(bet);
