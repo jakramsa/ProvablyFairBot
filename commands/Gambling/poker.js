@@ -83,7 +83,7 @@ module.exports = {
                     pokerGame.handRolls.push(rollValue);
                 }
                 resultsEmbed.addField("Player Hand",`${this.rollsToString(pokerGame.handRolls, pokerGame.removedRolls)}`, true)
-                    .addField("Select Holds",`Choose which cards you want to hold, within the next ${ this.responseTime/1000 } seconds. Enter the card numbers to hold separated by commas. Example: 1,2,5 will hold the first, second, and fifth card while discarding the rest.\n\n**All cards will be held if no valid response is received or you respond with hold.** `, true)
+                    .addField("Select Holds",`Choose which cards you want to hold, within the next ${ this.responseTime/1000 } seconds. Either react with the card numbers you want to hold then react with ${this.acceptEmoji} or enter the card numbers to hold separated by commas. Example: 1,2,5 will hold the first, second, and fifth card while discarding the rest.\n\n**All cards will be held if no valid response is received or you respond with hold.** `, true)
                     .setFooter((pokerGame.serverSeeds?`Server Seed(s): ${pokerGame.serverSeeds.join(", ")} `:"")+"Client Seed: '"+pokerGame.seed+"' Nonce: "+pokerGame.nonces.join(", "));
                 message.channel.send(resultsEmbed).then(async (m) => {
                     pokerGame.gameMessage = m;
@@ -123,6 +123,37 @@ module.exports = {
                         await m.react(this.positionEmojis[i]).catch(console.error);
                     }
                     await m.react(this.acceptEmoji).catch(console.error);
+                    m.awaitReactions((reaction, user) => { return reaction.emoji.name === this.acceptEmoji && user.id === message.author.id}, { maxEmojis: 1, time: this.responseTime, errors: ['time'] }
+                    ).then(async (collected) => {
+                        let holdArray = [];
+                        for(let i = 0; i < this.positionEmojis.length; i++){
+                           let reacted = m.reactions.find((reaction) => reaction.emoji.name === this.positionEmojis[i] && reaction.users.has(message.author.id));
+                           if(reacted){
+                               holdArray.push(i+1);
+                           }
+                        }
+                        let removeArray = new Array(5);
+                        for(let i = 5;i--;removeArray[i]=i+1);
+                        for(let i = 0; i < 5; i++){
+                            if(removeArray.includes(holdArray[i])){
+                                removeArray.splice(removeArray.indexOf(holdArray[i]), 1);
+                            }
+                            if(i < 5-holdArray.length){
+                                pokerGame.nonces.push(message.client.nonce);
+                                let rollValue = message.client.roll(clientSeed);
+                                if(rollValue === -1){
+                                    resultsEmbed.setTitle("An error occured while generating a roll.")
+                                    .setColor(embedColors.error);
+                                    message.client.poker.delete(message.author.id);
+                                    return message.channel.send(resultsEmbed).catch(console.error);
+                                }
+                                pokerGame.handRolls.push(rollValue);
+                            }
+                        }
+                        removeArray.sort(function(a, b) { return b - a; });
+                        pokerGame.removedRolls = removeArray;
+                        return this.showResults(pokerGame);
+                    }).catch((error) => {});
                     return;
                 }).catch(console.error);
                 return;
