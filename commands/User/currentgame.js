@@ -1,4 +1,5 @@
-const { prefix, embedColors } = require('../../config.json');
+const { prefix } = require('../../config.json');
+const endGame = require('./endgame.js');
 
 module.exports = {
     name: 'currentgame',
@@ -10,9 +11,14 @@ module.exports = {
     guildOnly: false,
     async execute(message, args) {
         const game = message.client.getGame(message.author.id);
-        if(game && game.gameMessage){ message.author.send(this.messageToLink(game.gameMessage)).catch(console.error); }
-    },
-    messageToLink(message){
-        return `https://discordapp.com/channels/${message.guild.id}/${message.channel.id}/${message.id}`;
+        if(game && game.gameMessage){
+            if(args && args[0] && args[0] === "end"){
+                endGame.execute(message, null);
+            } else {
+                message.author.send(`You are currently playing ${endGame.messageToLink(game.gameMessage)}.`).catch(console.error);
+            }
+        } else {
+            message.author.send("You are not currently in a game.").catch(console.error);
+        }
     }
 };

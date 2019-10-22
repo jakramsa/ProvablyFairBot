@@ -52,7 +52,8 @@ module.exports = {
                     .addField("Bet Options", this.rouletteBets.join(", "))
                     .addField("Bet Usage", "[Bet Option] [Bet Placement]")
                     .addField("Examples", "corner 1-2-4-5, street 16-17-18\ncolumn 2, dozen 3\nsingle 30, split 13-14");
-                await message.channel.send("", {'file': {'attachment': this.rouletteTableImage, 'name': 'table.jpg'}}).then(m=>message.channel.send(rouletteOptionsEmbed).catch(console.error)).catch(console.error);
+                await message.channel.send("", {'embed': rouletteOptionsEmbed,'file': {'attachment': this.rouletteTableImage, 'name': 'table.jpg'}}).then((m) => {return rouletteGame.gameMessage = m;}).catch(console.error);
+                message.client.roulette.set(message.author.id, rouletteGame);
                 message.channel.awaitMessages((m) => {return m.author.id === message.author.id && this.rouletteBets.includes(m.content.toLowerCase().split(/ +/g)[0])}, { maxMatches: 1, time: this.responseTime, errors: ['time'] })
                 .then(async (collected) => {
                     const response = collected.first();
