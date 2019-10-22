@@ -91,6 +91,7 @@ class ProvablyFairBot extends Discord.Client {
         this.swaps = new Discord.Collection();
         this.blackjack = new Discord.Collection();
         this.roulette = new Discord.Collection();
+        this.poker = new Discord.Collection();
         this.war = new Discord.Collection();
         this.commandQueue = [];
         this.processingCommand = false;
@@ -293,11 +294,11 @@ class ProvablyFairBot extends Discord.Client {
     }
 
     cannotBet(userId){
-        return this.swaps.has(userId) || this.blackjack.has(userId) || this.roulette.has(userId) || this.war.has(userId);
+        return this.swaps.has(userId) || this.blackjack.has(userId) || this.roulette.has(userId) || this.war.has(userId) || this.poker.has(userId);
     }
 
     getGame(userId){
-        return this.blackjack.get(userId) || this.roulette.get(userId) || this.war.get(userId);
+        return this.blackjack.get(userId) || this.roulette.get(userId) || this.war.get(userId) || this.poker.get(userId);
     }
 }
 
