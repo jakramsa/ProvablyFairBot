@@ -19,15 +19,16 @@ module.exports = {
             .setColor(embedColors.general);
         if(update){
             let blackjackGame = args;
+            let gameMessage = blackjackGame.gameMessage;
             let gameOver = false;
             if(update === 'hit'){
-                if(blackjackGame.serverSeeds && !blackjackGame.serverSeeds.includes(message.client.serverSeedId)){ blackjackGame.serverSeeds.push(message.client.serverSeedId); }
-                blackjackGame.nonces.push(message.client.nonce);
-                let rollValue = message.client.roll(blackjackGame.seed);
+                if(blackjackGame.serverSeeds && !blackjackGame.serverSeeds.includes(gameMessage.client.serverSeedId)){ blackjackGame.serverSeeds.push(gameMessage.client.serverSeedId); }
+                blackjackGame.nonces.push(gameMessage.client.nonce);
+                let rollValue = gameMessage.client.roll(blackjackGame.seed);
                 if(rollValue == -1){
                     resultsEmbed.setTitle("An error occured while generating a roll.")
                     .setColor(embedColors.error);
-                    return message.channel.send(resultsEmbed).catch(console.error);
+                    return gameMessage.channel.send(resultsEmbed).catch(console.error);
                 }
                 blackjackGame.playerRolls.push(rollValue);
             }
@@ -39,13 +40,13 @@ module.exports = {
             let dealerHandValue = this.rollsToHandValue(blackjackGame.dealerRolls);
             if(update === 'stand'){
                 while(dealerHandValue < 17){
-                    if(blackjackGame.serverSeeds && !blackjackGame.serverSeeds.includes(message.client.serverSeedId)){ blackjackGame.serverSeeds.push(message.client.serverSeedId); }
-                    blackjackGame.nonces.push(message.client.nonce);
-                    let rollValue = message.client.roll(blackjackGame.seed);
+                    if(blackjackGame.serverSeeds && !blackjackGame.serverSeeds.includes(gameMessage.client.serverSeedId)){ blackjackGame.serverSeeds.push(gameMessage.client.serverSeedId); }
+                    blackjackGame.nonces.push(gameMessage.client.nonce);
+                    let rollValue = gameMessage.client.roll(blackjackGame.seed);
                     if(rollValue == -1){
                         resultsEmbed.setTitle("An error occured while generating a roll.")
                         .setColor(embedColors.error);
-                        return message.channel.send(resultsEmbed).catch(console.error);
+                        return gameMessage.channel.send(resultsEmbed).catch(console.error);
                     }
                     blackjackGame.dealerRolls.push(rollValue);
                     dealerHandValue = this.rollsToHandValue(blackjackGame.dealerRolls);
@@ -54,7 +55,7 @@ module.exports = {
             }
             const wagerString = await currencyHandler.getCurrencyString(blackjackGame.bet);
             if(gameOver){
-                const payoutString = await currencyHandler.getCurrencyString(currencyHandler.Currency(blackjackGame.gameMessage.guild.id, blackjackGame.bet.name,
+                const payoutString = await currencyHandler.getCurrencyString(currencyHandler.Currency(gameMessage.guild.id, blackjackGame.bet.name,
  (playerHandValue <= 21 && playerHandValue == dealerHandValue?blackjackGame.bet.amount:(((playerHandValue <= 21 && playerHandValue > dealerHandValue) || (playerHandValue <= 21 && dealerHandValue > 21))?blackjackGame.bet.amount*this.multiplier:0)), blackjackGame.bet.userId));
                 resultsEmbed.addField("Blackjack",`Results: **${playerHandValue <= 21 && playerHandValue == dealerHandValue?"Tie":(((playerHandValue <= 21 && playerHandValue > dealerHandValue) || (playerHandValue <= 21 && dealerHandValue > 21))?"Player Wins":"Dealer Wins")}**\nWager: **${wagerString}** - Payout ${payoutString}`, false);
                 resultsEmbed.addField("Players Hand",`${this.rollsToString(blackjackGame.playerRolls, false)}`, true);
@@ -64,7 +65,7 @@ module.exports = {
                     resultsEmbed
                     .addField("Error", "An error occured updating wager.")
                     .setColor(embedColors.error);
-                    return message.channel.send(resultsEmbed).catch(console.error);
+                    return gameMessage.channel.send(resultsEmbed).catch(console.error);
                 }
                 const wagerAmount = await currencyHandler.parseCurrency(blackjackGame.bet);
                 if((playerHandValue <= 21 && playerHandValue > dealerHandValue) || (playerHandValue <= 21 && dealerHandValue > 21)){
@@ -82,7 +83,7 @@ module.exports = {
                     resultsEmbed
                     .addField("Error", "An error occured updating balance.")
                     .setColor(embedColors.error);
-                    return message.channel.send(resultsEmbed).catch(console.error);
+                    return gameMessage.channel.send(resultsEmbed).catch(console.error);
                 }
 
                 message.client.blackjack.delete(blackjackGame.bet.userId);
@@ -92,7 +93,7 @@ module.exports = {
                 resultsEmbed.addField("Dealers Hand",`${this.rollsToString(blackjackGame.dealerRolls, true)}`, true);
             }
             resultsEmbed.setFooter((blackjackGame.serverSeeds?`Server Seed(s): ${blackjackGame.serverSeeds.join(", ")} `:"")+"Client Seed: '"+blackjackGame.seed+"' Nonce: "+blackjackGame.nonces.join(", "));
-            return blackjackGame.gameMessage.edit("", resultsEmbed);
+            return gameMessage.edit("", resultsEmbed);
         }
         const currencyName = args[0];
         const betAmount = args[1];
