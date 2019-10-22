@@ -1,17 +1,17 @@
 const { prefix } = require('../../config.json');
 
 module.exports = {
-    name: 'currentgame',
-    description: 'Returns a link to your current game.',
-    aliases: ['cg'],
+    name: 'endgame',
+    description: 'Forfeits your current game.',
+    aliases: ['eg'],
     args: false,
-    usage(){ return `${prefix}${this.name} [end]`; },
+    usage(){ return `${prefix}${this.name}`; },
     cooldown: 0,
     guildOnly: false,
     async execute(message, args) {
         const game = message.client.getGame(message.author.id);
         if(game && game.gameMessage){
-            message.author.send(this.messageToLink(game.gameMessage)).catch(console.error);
+            message.author.send(`Would you like to forfeit the game you are playing at ${this.messageToLink(game.gameMessage)}? Response with **accept** to **forfeit**.\n**By forfeiting you will lose your bet.**`).then().catch(console.error);
         } else {
             message.author.send("You are not currently in a game.").catch(console.error);
         }
