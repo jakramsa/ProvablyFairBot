@@ -113,9 +113,6 @@ class ProvablyFairBot extends Discord.Client {
             if(message.author.bot || (this.config.guildRestriction.restrict && !this.config.guildRestriction.allowedGuilds.includes(message.guild.id))){ return; }
             const args = message.content.slice(message.content.startsWith(this.config.prefix)?this.config.prefix.length:0).toLowerCase().split(/ +/);
             const commandName = args.shift().toLowerCase();
-            if(message.channel.type === 'text' && !message.channel.permissionsFor(this.user).has(this.discord.Permissions.FLAGS.SEND_MESSAGES)){
-                return message.author.send("This bot does not have permission to respond in the channel you sent a message in.");
-            }
             if(commandName) {
                 if(this.swaps.has(message.author.id) && (commandName === 'accept' || commandName === 'decline')){
                     return this.commands.get('swap').execute(message, commandName, this.swaps.get(message.author.id)).catch(console.error);
@@ -128,6 +125,9 @@ class ProvablyFairBot extends Discord.Client {
 
             const command = this.commands.get(commandName) || this.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
             if(!command) { return; }
+            if(message.channel.type === 'text' && !message.channel.permissionsFor(this.user).has(this.discord.Permissions.FLAGS.SEND_MESSAGES) && command){
+                return message.author.send("This bot does not have permission to respond in the channel you sent a message in.");
+            }
             if(command.guildOnly && message.channel.type !== 'text'){
                 return message.reply(`${command.name} cannot be executed in DM's.`);
             }
